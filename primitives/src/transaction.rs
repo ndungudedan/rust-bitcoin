@@ -398,10 +398,9 @@ impl Decoder for TransactionDecoder {
 
     #[inline]
     fn push_bytes(&mut self, bytes: &mut &[u8]) -> Result<bool, Self::Error> {
-        use {
-            TransactionDecoderError as E, TransactionDecoderErrorInner as Inner,
-            TransactionDecoderState as State,
-        };
+        use TransactionDecoderError as E;
+        use TransactionDecoderErrorInner as Inner;
+        use TransactionDecoderState as State;
 
         loop {
             // Attempt to push to the currently-active decoder and return early on success.
@@ -524,10 +523,9 @@ impl Decoder for TransactionDecoder {
 
     #[inline]
     fn end(self) -> Result<Self::Output, Self::Error> {
-        use {
-            TransactionDecoderError as E, TransactionDecoderErrorInner as Inner,
-            TransactionDecoderState as State,
-        };
+        use TransactionDecoderError as E;
+        use TransactionDecoderErrorInner as Inner;
+        use TransactionDecoderState as State;
 
         match self.state {
             State::Version(_) => Err(E(Inner::EarlyEnd("version"))),
@@ -716,9 +714,12 @@ impl fmt::Display for TransactionDecoderError {
             E::NoWitnesses => write!(f, "non-empty Segwit transaction with no witnesses"),
             E::LockTime(ref e) => write_err!(f, "transaction decoder error"; e),
             E::EarlyEnd(s) => write!(f, "early end of transaction (still decoding {})", s),
-            E::NullPrevoutInNonCoinbase(index) => write!(f, "null prevout in non-coinbase transaction at input {}", index),
-            E::CoinbaseScriptSigTooSmall(len) => write!(f, "coinbase scriptSig too small: {} bytes (min 2)", len),
-            E::CoinbaseScriptSigTooLarge(len) => write!(f, "coinbase scriptSig too large: {} bytes (max 100)", len),
+            E::NullPrevoutInNonCoinbase(index) =>
+                write!(f, "null prevout in non-coinbase transaction at input {}", index),
+            E::CoinbaseScriptSigTooSmall(len) =>
+                write!(f, "coinbase scriptSig too small: {} bytes (min 2)", len),
+            E::CoinbaseScriptSigTooLarge(len) =>
+                write!(f, "coinbase scriptSig too large: {} bytes (max 100)", len),
         }
     }
 }
@@ -2240,7 +2241,10 @@ mod tests {
         decoder.push_bytes(&mut slice).unwrap();
         let err = decoder.end().expect_err("null prevout in non-coinbase tx should be rejected");
 
-        assert_eq!(err, TransactionDecoderError(TransactionDecoderErrorInner::NullPrevoutInNonCoinbase(0)));
+        assert_eq!(
+            err,
+            TransactionDecoderError(TransactionDecoderErrorInner::NullPrevoutInNonCoinbase(0))
+        );
     }
 
     #[test]
@@ -2256,7 +2260,10 @@ mod tests {
         decoder.push_bytes(&mut slice).unwrap();
         let err = decoder.end().expect_err("coinbase with 1-byte scriptSig should be rejected");
 
-        assert_eq!(err, TransactionDecoderError(TransactionDecoderErrorInner::CoinbaseScriptSigTooSmall(1)));
+        assert_eq!(
+            err,
+            TransactionDecoderError(TransactionDecoderErrorInner::CoinbaseScriptSigTooSmall(1))
+        );
     }
 
     #[test]
@@ -2272,7 +2279,10 @@ mod tests {
         decoder.push_bytes(&mut slice).unwrap();
         let err = decoder.end().expect_err("coinbase with 101-byte scriptSig should be rejected");
 
-        assert_eq!(err, TransactionDecoderError(TransactionDecoderErrorInner::CoinbaseScriptSigTooLarge(101)));
+        assert_eq!(
+            err,
+            TransactionDecoderError(TransactionDecoderErrorInner::CoinbaseScriptSigTooLarge(101))
+        );
     }
 
     #[test]
