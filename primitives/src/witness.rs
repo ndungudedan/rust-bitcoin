@@ -337,7 +337,8 @@ impl Decoder for WitnessDecoder {
     type Error = WitnessDecoderError;
 
     fn push_bytes(&mut self, bytes: &mut &[u8]) -> Result<bool, Self::Error> {
-        use {WitnessDecoderError as E, WitnessDecoderErrorInner as Inner};
+        use WitnessDecoderError as E;
+        use WitnessDecoderErrorInner as Inner;
 
         // Read initial witness element count.
         if self.witness_elements.is_none() {
@@ -445,7 +446,8 @@ impl Decoder for WitnessDecoder {
     }
 
     fn end(mut self) -> Result<Self::Output, Self::Error> {
-        use {WitnessDecoderError as E, WitnessDecoderErrorInner as Inner};
+        use WitnessDecoderError as E;
+        use WitnessDecoderErrorInner as Inner;
 
         let Some(witness_elements) = self.witness_elements else {
             // Never read the witness element count.
@@ -1093,15 +1095,15 @@ mod test {
     #[test]
     fn witness_size() {
         let mut witness = Witness::new();
-        let want = 1;           // Number of elements compact size encoded.
+        let want = 1; // Number of elements compact size encoded.
         assert_eq!(witness.size(), want);
 
         witness.push([1, 2, 3]);
-        let want = 5;           // 1 + 1 + 3
+        let want = 5; // 1 + 1 + 3
         assert_eq!(witness.size(), want);
 
         witness.push([4, 5]);
-        let want = 8;           // 5 + 1 + 2
+        let want = 8; // 5 + 1 + 2
         assert_eq!(witness.size(), want);
     }
 
